@@ -36,7 +36,7 @@ Then add `.product(name: "TSRP", package: "TSRP")` to your target's dependencies
 ```swift
 import TSRP
 
-let store = Store()  // ~/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings
+let store = TSRP.Store()  // ~/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings
 try await store.checkAccess()
 
 let result = try await store.search(.init(query: "standup"))
@@ -46,7 +46,7 @@ for recording in result.recordings {
     guard let file = await store.audioFile(for: recording) else {
         continue  // The audio is only in iCloud.
     }
-    print(file.url, file.contentType?.preferredMIMEType ?? "", file.duration ?? 0)
+    print(file.url, file.mimeType ?? "", file.duration ?? 0)
 
     if file.hasTranscript, let transcript = try await store.transcript(for: recording) {
         print(transcript.text)
