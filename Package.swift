@@ -17,6 +17,10 @@ let package = Package(
         .target(
             name: "TSRP",
             dependencies: []
-        )
+        ),
+        .testTarget(
+            name: "TSRPTests",
+            dependencies: ["TSRP"]
+        ),
     ]
 )
