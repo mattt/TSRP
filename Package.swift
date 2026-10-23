@@ -22,5 +22,12 @@ let package = Package(
             name: "TSRPTests",
             dependencies: ["TSRP"]
         ),
+        // A development tool that checks TSRP against a real Voice Memos library.
+        // It is not a product, so packages that depend on TSRP don't build it.
+        .executableTarget(
+            name: "Validate",
+            dependencies: ["TSRP"],
+            path: "Tools/Validate"
+        ),
     ]
 )
