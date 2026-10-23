@@ -7,7 +7,8 @@ public struct AudioFile: Sendable, Hashable {
     public let url: URL
     /// The type of the file: MPEG-4 audio (`.m4a`) or QuickTime audio (`.qta`).
     ///
-    /// Use its `preferredMIMEType` to describe the file to other software.
+    /// macOS declares QuickTime audio (`com.apple.quicktime-audio`) in macOS 26 and later.
+    /// In earlier releases, a `.qta` file has a dynamic type that conforms to `public.audio`.
     public let contentType: UTType?
     /// The size of the file, in bytes.
     public let size: Int
@@ -15,6 +16,17 @@ public struct AudioFile: Sendable, Hashable {
     public let duration: TimeInterval?
     /// Whether Voice Memos wrote a transcript into the file.
     public let hasTranscript: Bool
+
+    /// The MIME type of the file: `audio/x-m4a` or `audio/x-quicktime`, as macOS declares them.
+    ///
+    /// The type for QuickTime audio is the one that macOS 26 declares;
+    /// TSRP supplies it in earlier releases, which declare none.
+    public var mimeType: String? {
+        if let mimeType = contentType?.preferredMIMEType {
+            return mimeType
+        }
+        return url.pathExtension.lowercased() == "qta" ? "audio/x-quicktime" : nil
+    }
 
     /// Reads the movie header of a file.
     ///
@@ -26,7 +38,7 @@ public struct AudioFile: Sendable, Hashable {
         guard values?.isRegularFile == true, let size = values?.fileSize, size > 0 else { return nil }
         self.url = url
         self.size = size
-        contentType = UTType(filenameExtension: url.pathExtension)
+        contentType = UTType(filenameExtension: url.pathExtension, conformingTo: .audio)
         let header = try? MovieHeader(contentsOf: url)
         duration = header?.duration
         hasTranscript = header?.transcriptData != nil

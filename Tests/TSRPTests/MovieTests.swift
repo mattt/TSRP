@@ -96,13 +96,15 @@ import Testing
     func audioFile() throws {
         let m4a = try write("a.m4a", Atoms.movie(track: Atoms.userDataTrack(Transcripts.table)))
         let file = try #require(AudioFile(url: m4a))
-        #expect(file.contentType?.preferredMIMEType == "audio/x-m4a")
+        #expect(file.mimeType == "audio/x-m4a")
         #expect(file.duration == 2.5)
         #expect(file.hasTranscript)
         #expect(file.size == (try Data(contentsOf: m4a)).count)
 
         let qta = try write("b.qta", Atoms.movie(brand: "qt  ", track: Atoms.trackHeader))
-        #expect(AudioFile(url: qta)?.contentType?.preferredMIMEType == "audio/x-quicktime")
+        // macOS 15 declares no type for QuickTime audio, so TSRP supplies the MIME type that macOS 26 declares.
+        #expect(AudioFile(url: qta)?.mimeType == "audio/x-quicktime")
+        #expect(AudioFile(url: qta)?.contentType?.conforms(to: .audio) == true)
         #expect(AudioFile(url: qta)?.hasTranscript == false)
 
         // iCloud can leave an empty file for a recording whose audio is in the cloud.
