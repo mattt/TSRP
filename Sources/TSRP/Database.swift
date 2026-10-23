@@ -233,7 +233,9 @@ extension Database {
             bindings += [.double(cursor.date), .double(cursor.date), .integer(cursor.id)]
         }
         // Read one more row than the limit, to know whether another page follows.
-        bindings.append(.integer(Int64(request.limit) + 1))
+        // A limit of Int64.max reads every row, so it has no row to add.
+        let limit = Int64(clamping: request.limit)
+        bindings.append(.integer(limit == .max ? limit : limit + 1))
 
         let rows = try query(
             """

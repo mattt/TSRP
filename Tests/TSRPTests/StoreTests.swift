@@ -89,6 +89,13 @@ import Testing
         #expect(pages == [[5, 3], [2, 1], [6]])
     }
 
+    @Test("The largest limit returns every recording")
+    func largestLimit() async throws {
+        let result = try await store.search(.init(limit: .max))
+        #expect(result.recordings.map(\.id.rawValue) == [5, 3, 2, 1, 6])
+        #expect(result.nextCursor == nil)
+    }
+
     @Test("A limit that is not positive throws")
     func invalidLimit() async {
         await #expect(throws: VoiceMemosError.invalidLimit(0)) {
