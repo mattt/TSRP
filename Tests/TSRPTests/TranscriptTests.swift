@@ -20,6 +20,15 @@ import Testing
         #expect(transcript.segments.map(\.timeRange) == [0 ... 0.5, 0.5 ... 1.25])
     }
 
+    @Test("A base letter and combining accent keep their separate time ranges")
+    func combiningAccent() throws {
+        let data = Data(#"{"attributedString":["e",{"timeRange":[0,1]},"\u0301",{"timeRange":[1,2]}]}"#.utf8)
+        let transcript = try Transcript(data: data)
+        #expect(transcript.text == "é")
+        #expect(transcript.segments.map(\.text) == ["e", "\u{0301}"])
+        #expect(transcript.segments.map(\.timeRange) == [0 ... 1, 1 ... 2])
+    }
+
     @Test("A recording with no speech has an empty transcript")
     func empty() throws {
         let transcript = try Transcript(data: Transcripts.empty)

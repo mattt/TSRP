@@ -48,7 +48,8 @@ public struct Transcript: Sendable, Hashable {
         segments = string.runs.map { run in
             let range = run[TimeRangeAttribute.self]
             return Segment(
-                text: String(string[run.range].characters),
+                // A run can end between a base letter and its combining accent.
+                text: String(String.UnicodeScalarView(string[run.range].unicodeScalars)),
                 timeRange: range.flatMap { $0.count == 2 && $0[0] <= $0[1] ? $0[0] ... $0[1] : nil }
             )
         }
